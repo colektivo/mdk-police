@@ -3,6 +3,7 @@ package com.mdk.police;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import com.sun.jna.Platform;
 import io.socket.client.IO;
 import io.socket.emitter.Emitter;
 import org.json.JSONArray;
@@ -124,10 +125,18 @@ public class Main {
                 dev.setInputReportListener(new InputReportListener() {
                     public void onInputReport(HidDevice source, byte Id, byte[] data, int len) {
                         try {
-                            long location = source.getHidDeviceInfo().getLocationId();
 
-                            String deviceId = String.format("%s", location);
-                            socket.emit(deviceId, data);
+                            if (Platform.isMac()){
+                                long location = source.getHidDeviceInfo().getLocationId();
+                                String deviceId = String.format("%s", location);
+                                socket.emit(deviceId, data);
+                            } else {
+                                String path = source.getHidDeviceInfo().getPath();
+                                String deviceId = String.format("%s", path);
+                                socket.emit(deviceId, data);
+                            }
+
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
