@@ -58,7 +58,7 @@ public class Main {
                 ArrayList<String> devices = new ArrayList<String>();
 
                 for (HidDeviceInfo devInfo: foundDevices) {
-                    devices.add(String.format("%s", devInfo.getLocationId()));
+                    devices.add(String.format("%s", getIdForPlatform(devInfo)));
                 }
 
 
@@ -104,7 +104,7 @@ public class Main {
             for (HidDeviceInfo info : devList) {
                 if (info.getProductString().contains("SYC ID&IC USB Reader")) {
                     foundDevices.add(info);
-                    System.out.printf("    added: %s\n", info.getLocationId());
+                    System.out.printf("    added: %s\n", getIdForPlatform(info));
                 }
             }
 
@@ -113,6 +113,15 @@ public class Main {
         }
         return foundDevices;
 
+    }
+
+    private static String getIdForPlatform(HidDeviceInfo device){
+        if (Platform.isMac()) {
+            String deviceId = String.format("%s", device.getLocationId());
+            return deviceId;
+        } else {
+            return device.getPath();
+        }
     }
 
     private static void captureAndSendDeviceData(List<HidDeviceInfo> devices) {
@@ -126,16 +135,7 @@ public class Main {
                     public void onInputReport(HidDevice source, byte Id, byte[] data, int len) {
                         try {
 
-                            if (Platform.isMac()){
-                                long location = source.getHidDeviceInfo().getLocationId();
-                                String deviceId = String.format("%s", location);
-                                socket.emit(deviceId, data);
-                            } else {
-                                String path = source.getHidDeviceInfo().getPath();
-                                String deviceId = String.format("%s", path);
-                                System.out.printf("device: %s"+ deviceId);
-                                socket.emit(deviceId, data);
-                            }
+                            socket.emit(getIdForPlatform(source.getHidDeviceInfo()), data);
 
 
                         } catch (Exception e) {
