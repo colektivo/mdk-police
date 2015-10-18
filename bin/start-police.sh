@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-cd mdkpolice
+cd $MDK_HOME/mdk-police/bin/mdkpolice
 sudo java -jar mdkpolice.jar
