@@ -133,6 +133,7 @@ public class Main {
                             } else {
                                 String path = source.getHidDeviceInfo().getPath();
                                 String deviceId = String.format("%s", path);
+                                System.out.printf("device: %s"+ deviceId);
                                 socket.emit(deviceId, data);
                             }
 
